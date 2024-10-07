@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2017/04/04 08:39:30.835,=rtl.dcp</Transaction>
+    <Transaction>2017/04/04 08:39:40.120,C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\CurrencyEditFMX.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>2017/04/04 08:40:02.137,=D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEdit.pas</Transaction>
+    <Transaction>2017/04/04 08:40:10.499,D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\CurrencyEditFMX.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\CurrencyEditFMX.dproj</Transaction>
+    <Transaction>2017/04/04 08:40:25.215,=FMX.dcp</Transaction>
+    <Transaction>2017/04/04 08:41:48.245,D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEditFMX.pas=D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEdit.pas</Transaction>
+  </Transactions>
+  <ActiveMobileDevice>   <NoProfile iOSSimulator="iPhone5"/>
+  </ActiveMobileDevice>
+</BorlandProject>

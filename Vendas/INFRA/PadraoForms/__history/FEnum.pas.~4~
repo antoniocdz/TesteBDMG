@@ -1,0 +1,10 @@
+unit FEnum;
+
+interface
+
+type
+  TStatusCadastro = (ecInserir, ecAlterar, ecError, ecNenhum);
+
+implementation
+
+end.

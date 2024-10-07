@@ -1,0 +1,323 @@
+unit Model.Concrete.Cliente;
+
+interface
+
+uses
+  System.Classes,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef, FireDAC.VCLUI.Wait, Data.DB, System.SysUtils,FireDAC.DApt,
+  Dao.ConexaoFactory.Interfaces;
+
+type
+  iModelQuery = interface;
+  iModelConexao = interface
+    function Connection : TObject;
+  end;
+  iModelConexaoFactory = interface
+    function Conexao : iModelConexao;
+    function Query : iModelQuery;
+  end;
+  iModelQuery = interface
+    function Query : TObject;
+    function Open(aSQL : String) : iModelQuery;
+    function RptSelects(aSQL : String) : iModelQuery;
+    function ExecSQL(aSQL : String) : iModelQuery;
+  end;
+  iModelEntidadeCliente = interface
+    function DataSet ( aValue : TDataSource ) : iModelEntidadeCliente;
+    procedure Open(ACodigo: Integer;ANome: string);
+    procedure RptSelects(ACodigo: Integer);
+    function ExecSql(Acodigocli: Integer; Anomecli: string;
+      Acpfcli: string; Astatuscli: string; Adatanasccli: TDate; AStatus: string): Boolean;
+  end;
+  iModelEntidadeClienteFactory = interface
+    function Cliente : iModelEntidadeCliente;
+  end;
+Type
+  TModelFiredacConexao = class(TInterfacedObject, iModelConexao)
+    private
+      FConexao : TFDConnection;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New : iModelConexao;
+      function Connection : TObject;
+  end;
+Type
+  TModelFiredacQuery = class(TInterfacedObject, iModelQuery)
+    private
+      FQuery : TFDQuery;
+      FConexao : iModelConexao;
+    public
+      constructor Create(aValue : iModelConexao);
+      destructor Destroy; override;
+      class function New(aValue : iModelConexao) : iModelQuery;
+      function Query : TObject;
+      function Open(aSQL : String) : iModelQuery;
+      function RptSelects(aSQL : String) : iModelQuery;
+      function ExecSQL(aSQL : String) : iModelQuery;
+  end;
+Type
+  TModelConexaoFactory = class(TInterfacedObject, iModelConexaoFactory)
+    private
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New : iModelConexaoFactory;
+      function Conexao : iModelConexao;
+      function Query : iModelQuery;
+  end;
+Type
+  TModelEntidadeCliente = class(TInterfacedObject, iModelEntidadeCliente)
+    private
+      FQuery : iModelQuery;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New : iModelEntidadeCliente;
+      function DataSet ( aValue : TDataSource ) : iModelEntidadeCliente;
+      procedure Open(ACodigo: Integer; ANome: string);
+      procedure RptSelects(ACodigo: Integer);
+      function ExecSql(Acodigocli: Integer; Anomecli: string;
+        Acpfcli: string; Astatuscli: string; Adatanasccli: TDate; AStatus: string): Boolean;
+  end;
+type
+    TModelEntidadesClienteFactory = class(TInterfacedObject, iModelEntidadeClienteFactory)
+    private
+      FCliente : iModelEntidadeCliente;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New : iModelEntidadeClienteFactory;
+      function Cliente : iModelEntidadeCliente;
+    end;
+implementation
+
+uses
+  StrUtils;
+
+{ TModelFiredacConexao }
+function TModelFiredacConexao.Connection: TObject;
+begin
+  Result := FConexao;
+end;
+constructor TModelFiredacConexao.Create;
+var
+  MSSqlServerDriver : IConexaoFactory;
+begin
+  try
+    MSSqlServerDriver := TSQLServerConexaoFactory.Create;
+    FConexao := TFDConnection.Create(nil);
+
+    FConexao := MSSqlServerDriver.Getconexao;
+  except
+    on E: Exception do
+      raise Exception.CreateFmt('Erro: %s', [E.Message]);
+  end;
+end;
+destructor TModelFiredacConexao.Destroy;
+begin
+  FreeAndNil(FConexao);
+  inherited;
+end;
+class function TModelFiredacConexao.New: iModelConexao;
+begin
+  Result := Self.Create;
+end;
+
+{ TModelFiredacQuery }
+constructor TModelFiredacQuery.Create(aValue: iModelConexao);
+begin
+  FConexao := aValue;
+  FQuery := TFDQuery.Create(nil);
+  FQuery.Connection := TFDConnection(FConexao.Connection);
+end;
+destructor TModelFiredacQuery.Destroy;
+begin
+  FreeAndNil(FQuery);
+  inherited;
+end;
+function TModelFiredacQuery.ExecSQL(aSQL: String): iModelQuery;
+begin
+  Result := Self;
+  FQuery.ExecSQL(aSQL);
+end;
+class function TModelFiredacQuery.New(aValue: iModelConexao): iModelQuery;
+begin
+  Result := Self.Create(aValue);
+end;
+function TModelFiredacQuery.Open(aSQL: String): iModelQuery;
+begin
+  Result := Self;
+  FQuery.Open(aSQL);
+end;
+function TModelFiredacQuery.Query: TObject;
+begin
+  Result := FQuery;
+end;
+function TModelFiredacQuery.RptSelects(aSQL: String): iModelQuery;
+begin
+  Result := Self;
+  FQuery.Open(aSQL);
+end;
+
+{ TModelConexaoFactory }
+function TModelConexaoFactory.Conexao: iModelConexao;
+begin
+  Result := TModelFiredacConexao.New;
+end;
+constructor TModelConexaoFactory.Create;
+begin
+end;
+destructor TModelConexaoFactory.Destroy;
+begin
+  inherited;
+end;
+class function TModelConexaoFactory.New: iModelConexaoFactory;
+begin
+  Result := Self.Create;
+end;
+function TModelConexaoFactory.Query: iModelQuery;
+begin
+  Result := TModelFiredacQuery.New(Self.Conexao);
+end;
+{ TModelEntidadeCliente }
+constructor TModelEntidadeCliente.Create;
+begin
+  FQuery := TModelConexaoFactory.New.Query;
+end;
+function TModelEntidadeCliente.DataSet(aValue: TDataSource): iModelEntidadeCliente;
+begin
+  Result := Self;
+  aValue.DataSet := TDataSet(FQuery.Query);
+end;
+destructor TModelEntidadeCliente.Destroy;
+begin
+  inherited;
+end;
+function TModelEntidadeCliente.ExecSql(Acodigocli: Integer; Anomecli, Acpfcli,
+  Astatuscli: string; Adatanasccli: TDate; AStatus: string): Boolean;
+var
+  sSQL: string;
+begin
+  try
+    case AnsiIndexStr(AStatus, ['ecInserir', 'ecAlterar','ecExcluir']) of
+     0: begin
+          if Adatanasccli > StrToDate('01/01/1900')
+          then
+          begin
+            sSQL:= 'INSERT INTO Clientes (nomecli, cpfcli, statuscli, datanasccli) ';
+            sSQL:= sSQL + ' VALUES ( ' +
+            QuotedStr(Anomecli) + ', ' +
+            QuotedStr(Acpfcli) + ', ' +
+            QuotedStr(Astatuscli) + ', ' +
+            ' CONVERT(datetime, ''' + FormatDateTime('yyyy-mm-dd', Adatanasccli)+ ''', 120))'
+          end
+          else
+          begin
+            sSQL:= 'INSERT INTO Clientes (nomecli, cpfcli, statuscli) ';
+            sSQL:= sSQL + ' VALUES ( ' +
+            QuotedStr(Anomecli) + ', ' +
+            QuotedStr(Acpfcli) + ', ' +
+            QuotedStr(Astatuscli) + ' )';
+          end;
+
+     end;
+     1: begin
+          sSQL:= 'UPDATE Clientes SET '
+                  + ' nomecli = '     + QuotedStr(Anomecli) + ', '
+                  + ' cpfcli = '      + QuotedStr(Acpfcli) + ', '
+                  + ' statuscli = '   + QuotedStr(Astatuscli) + ', '
+                  + ' datanasccli = ' + '''' + FormatDateTime('yyyy-MM-dd', Adatanasccli) + ''''
+                  + ' where codigocli = ' + IntToStr(Acodigocli);
+
+        end;
+     2: sSQL:= 'DELETE FROM Clientes where codigocli = ' + IntToStr(Acodigocli);
+
+    end;
+
+    FQuery.ExecSQL(sSQL);
+    Result:= True;
+  except
+    on E: Exception do
+    begin
+      Result:= False;
+      raise Exception.CreateFmt('Erro: %s', [E.Message]);
+    end;
+  end;
+end;
+
+class function TModelEntidadeCliente.New: iModelEntidadeCliente;
+begin
+  Result := Self.Create;
+end;
+procedure TModelEntidadeCliente.Open(ACodigo: Integer;ANome: string);
+var
+  sSql : string;
+begin
+  try
+    sSql:= 'Select codigocli As Codigo' + ', '
+           + 'nomecli As Nome'      + ', '
+           + 'cpfcli As CPF'   + ', '
+           + 'statuscli As Status'  + ', '
+           + 'datanasccli As DataNasc';
+           if ANome = EmptyStr
+           then
+           begin
+             if ACodigo = 0 then
+              sSql:= sSql + ' FROM Clientes order by Nome asc '
+             else
+              sSql:= sSql + ' FROM Clientes where codigocli = ' + IntToStr(ACodigo);
+           end
+           else
+             sSql:= sSql + ' FROM Clientes where codigocli > 0 And (LOWER(nomecli) LIKE ' + QuotedStr(ANome + '%') + ')';
+
+    FQuery.Open(sSql);
+    except
+    on E: Exception do
+      raise Exception.CreateFmt('Erro: %s', [E.Message]);
+
+  end;
+end;
+procedure TModelEntidadeCliente.RptSelects(ACodigo: Integer);
+var
+  sSql : string;
+begin
+  try
+    case ACodigo of
+      0: begin
+        sSql:= 'select Codigocli as Codigo, nomecli as Nome, statuscli As Status ' +
+        ' from Clientes where statuscli = ''Ativo''' +
+        ' order by nomecli asc';
+      end;
+    end;
+    FQuery.Open(sSql);
+    except
+    on E: Exception do
+      raise Exception.CreateFmt('Erro: %s', [E.Message]);
+  end;
+
+end;
+
+{ TModelEntidadesClienteFactory }
+constructor TModelEntidadesClienteFactory.Create;
+begin
+end;
+destructor TModelEntidadesClienteFactory.Destroy;
+begin
+  inherited;
+end;
+class function TModelEntidadesClienteFactory.New: iModelEntidadeClienteFactory;
+begin
+  Result := Self.Create;
+end;
+function TModelEntidadesClienteFactory.Cliente: iModelEntidadeCliente;
+begin
+  if not Assigned(FCliente) then
+    FCliente := TModelEntidadeCliente.New;
+  Result := FCliente;
+end;
+
+end.

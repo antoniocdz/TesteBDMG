@@ -1,0 +1,33 @@
+unit Dao.DmDadosVirtuais;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient;
+
+type
+  TDataModule1 = class(TDataModule)
+    dsVendasItens: TDataSource;
+    cdsVendasItens: TClientDataSet;
+    cdsVendasItensNomeProduto: TStringField;
+    cdsVendasItensValorTotalProduto: TFloatField;
+    cdsVendasItensValorTotalVenda: TAggregateField;
+    cdsVendasItensCodigoprod: TIntegerField;
+    cdsVendasItensPrecoUnitProd: TCurrencyField;
+    cdsVendasItensQuantidadeProd: TCurrencyField;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DataModule1: TDataModule1;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

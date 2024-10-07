@@ -1,0 +1,48 @@
+unit RptVendasPorCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RRelatorioGroup, RLReport, Data.DB,
+  Datasnap.DBClient;
+
+type
+  TfrmRelatorioGroup1 = class(TfrmRelatorioGroup)
+    RLBand2: TRLBand;
+    RLBand3: TRLBand;
+    RLLabel5: TRLLabel;
+    RLLabel6: TRLLabel;
+    RLLabel8: TRLLabel;
+    RLLabel7: TRLLabel;
+    RLLabel4: TRLLabel;
+    RLLabel3: TRLLabel;
+    RLLabel2: TRLLabel;
+    RLLabel1: TRLLabel;
+    RLDraw2: TRLDraw;
+    RLDBTDataVenda: TRLDBText;
+    RLDBTNumVenda: TRLDBText;
+    RLDBTCliente: TRLDBText;
+    RLDBTProduto: TRLDBText;
+    RLDBTPrecoUnit: TRLDBText;
+    RLDBTQuantidade: TRLDBText;
+    TotalProd: TRLDBText;
+    RLDBTStatus: TRLDBText;
+    RLBand4: TRLBand;
+    RLDraw4: TRLDraw;
+    RLLabel9: TRLLabel;
+    RLDBRTotalVenda: TRLDBResult;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmRelatorioGroup1: TfrmRelatorioGroup1;
+
+implementation
+
+{$R *.dfm}
+
+end.

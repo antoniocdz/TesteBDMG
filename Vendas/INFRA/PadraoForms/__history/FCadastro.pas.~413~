@@ -1,0 +1,510 @@
+unit FCadastro;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  Data.DB, System.Classes, Vcl.Graphics, Datasnap.DBClient, System.Generics.Collections,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, RegularExpressions,
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.Mask,
+  Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, uCurrencyEditVCL,
+
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait,
+  FireDAC.Comp.Client,FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
+  FEnum;
+
+type
+  Tfrmcadpadrao = class(TForm)
+    pnrodape: TPanel;
+    pgcPrincipal: TPageControl;
+    tabListagem: TTabSheet;
+    tabManutencao: TTabSheet;
+    pnCabecalho: TPanel;
+    grdListagem: TDBGrid;
+    btnNovo: TBitBtn;
+    btnAlterar: TBitBtn;
+    btnCancelar: TBitBtn;
+    btnGravar: TBitBtn;
+    btnExcluir: TBitBtn;
+    btnSair: TBitBtn;
+    bdnNavegar: TDBNavigator;
+    dsPadrao: TDataSource;
+    Label1: TLabel;
+    mskPesquisa: TMaskEdit;
+    btnPesquisar: TBitBtn;
+    cdsPesquisa: TClientDataSet;
+    cdsaux: TClientDataSet;
+    dsaux: TDataSource;
+    cdsProdutos: TClientDataSet;
+    dsProdutos: TDataSource;
+    cdsprevendas: TClientDataSet;
+    dsprevendas: TDataSource;
+    procedure btnNovoClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure mskPesquisaChange(Sender: TObject);
+    procedure grdListagemMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    procedure ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                                         btnGravar, btnExcluir:TBitBtn;
+                                         Navegador: TDBNavigator; pgcPrincipal: TPageControl; Flag: Boolean);
+    procedure ControleAbas(pgcPrincipal: TPageControl; Indice : Integer);
+
+    function  CamposObrigatorios: Boolean;
+    procedure DesabilitarCampos;
+    procedure LimparCampos;
+    procedure SairForm;
+
+  protected
+    StatusCadastro : TStatusCadastro;
+    _IndiceAtual: string;
+    _Codigo : Integer;
+    _CodigoCliente: Integer;
+    function getSomenteNumeros(Const ANumeros:String):String;
+    function getMascaraCPF(ACPF: String): String;
+    function getMascaraCNPJ(ACNPJ: String): String;
+    function ValidaDataNasc(ADataNasc: TDate): Boolean;
+    function FormatValor(AValor: Double): Currency;
+    function Gravar(StatusCadastro:TStatusCadastro): Boolean; virtual;
+    function Excluir:Boolean; virtual;
+    procedure Selects(ACodigo: Integer; AIndiceAtual: string); virtual;
+    procedure Lista(ACodigo: Integer); virtual;
+
+  public
+
+ end;
+
+var
+  frmcadpadrao: Tfrmcadpadrao;
+
+implementation
+
+uses
+  System.StrUtils;
+
+
+
+
+{$R *.dfm}
+
+{$REGION 'OBSERVAÇÕES'}
+{
+  Tag = 1 - Campos Obrigatório.
+  Tag = 2 - Campos Chaves(PK ou FK).
+}
+{$ENDREGION}
+
+function Tfrmcadpadrao.CamposObrigatorios: Boolean;
+var
+  i: Integer;
+begin
+  Result:= False;
+  for i := 0 to ComponentCount -1 do
+  begin
+    if (Components[i] is TLabeledEdit) then
+    begin
+      if (TLabeledEdit(Components[i]).Tag = 2)
+        and
+         (TLabeledEdit(Components[i]).Text = EmptyStr)
+      then
+      Begin
+         MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption
+         + ' é um campo obrigatório.', mtInformation, [mbOK], 0);
+         TLabeledEdit(Components[i]).SetFocus;
+         Result:= True;
+         Break;
+      End;
+
+      //Válida Campo CPF e CNPJ
+      if (TLabeledEdit(Components[i]).Tag = 2)
+        and
+         (TLabeledEdit(Components[i]).Name = 'edtCPF')
+      then
+      Begin
+        if (getSomenteNumeros(TLabeledEdit(Components[i]).Text) = EmptyStr)
+         or
+          (Length(getSomenteNumeros(TLabeledEdit(Components[i]).Text)) < 11)
+         then
+         begin
+           MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption
+           + ' é um campo obrigatório, somente válido.', mtInformation, [mbOK], 0);
+           TLabeledEdit(Components[i]).SetFocus;
+           Result:= True;
+           Break;
+         end;
+      End;
+
+      //Válida Campo CPF e CNPJ
+      if (TLabeledEdit(Components[i]).Tag = 2)
+        and
+         (TLabeledEdit(Components[i]).Name = 'edtCPF')
+      then
+      Begin
+        if (getSomenteNumeros(TLabeledEdit(Components[i]).Text) = EmptyStr)
+         or
+          (Length(getSomenteNumeros(TLabeledEdit(Components[i]).Text)) < 11)
+         then
+         begin
+           MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption
+           + ' é um campo obrigatório, somente válido.', mtInformation, [mbOK], 0);
+           TLabeledEdit(Components[i]).SetFocus;
+           Result:= True;
+           Break;
+         end;
+      End;
+
+      if (TLabeledEdit(Components[i]).Tag = 2)
+        and
+         (TLabeledEdit(Components[i]).Name = 'edtCNPJ')
+      then
+      Begin
+        if (getSomenteNumeros(TLabeledEdit(Components[i]).Text) = EmptyStr)
+         or
+          (Length(getSomenteNumeros(TLabeledEdit(Components[i]).Text)) < 14)
+         then
+         begin
+           MessageDlg(TLabeledEdit(Components[i]).EditLabel.Caption
+           + ' é um campo obrigatório, somente válido.', mtInformation, [mbOK], 0);
+           TLabeledEdit(Components[i]).SetFocus;
+           Result:= True;
+           Break;
+         end;
+      End;
+    end;
+
+    if (Components[i] is TRadioGroup) then
+    begin
+      if (TRadioGroup(Components[i]).Tag = 2)
+        and
+         (TRadioGroup(Components[i]).ItemIndex = -1)
+      then
+      Begin
+         MessageDlg(TRadioGroup(Components[i]).Caption
+         + ' é um campo obrigatório.', mtInformation, [mbOK], 0);
+         TRadioGroup(Components[i]).SetFocus;
+         Result:= True;
+         Break;
+      End;
+    end;
+
+    if (Components[i] is TCurrencyEdit) then
+    begin
+      if (TCurrencyEdit(Components[i]).Tag = 2)
+        and
+         (TCurrencyEdit(Components[i]).value = 0)
+      then
+      Begin
+         MessageDlg(TCurrencyEdit(Components[i]).Text
+         + ' é um campo obrigatório.', mtInformation, [mbOK], 0);
+         TLabeledEdit(Components[i]).SetFocus;
+         Result:= True;
+         Break;
+      End;
+    end;
+
+    if (Components[i] is TDBLookupComboBox)
+     then
+     begin
+        if (TDBLookupComboBox(Components[i]).Tag = 2)
+          and
+          TDBLookupComboBox(Components[i]).KeyValue = null
+        then
+        Begin
+           MessageDlg(' Fornecedor é um campo obrigatório.', mtInformation, [mbOK], 0);
+           TDBLookupComboBox(Components[i]).SetFocus;
+           Result:= True;
+           Break;
+        End;
+     end;
+
+  end;
+
+end;
+
+procedure Tfrmcadpadrao.ControleAbas(pgcPrincipal: TPageControl;
+  Indice: Integer);
+begin
+  if (pgcPrincipal.Pages[Indice].TabVisible) then
+    pgcPrincipal.TabIndex:= Indice;
+
+end;
+
+procedure Tfrmcadpadrao.ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                                         btnGravar, btnExcluir:TBitBtn;
+                                         Navegador: TDBNavigator; pgcPrincipal: TPageControl; Flag: Boolean);
+begin
+  btnNovo.Enabled     := Flag;
+  btnAlterar.Enabled  := Flag;
+  btnExcluir.Enabled  := Flag;
+  Navegador.Enabled   := Flag;
+  btnCancelar.Enabled := not(Flag);
+  btnGravar.Enabled   := not(Flag);
+  pgcPrincipal.Pages[0].TabVisible:= Flag;
+
+end;
+procedure Tfrmcadpadrao.DesabilitarCampos;
+var
+  i: Integer;
+begin
+  for i := 0 to ComponentCount -1 do
+  begin
+    if (Components[i] is TLabeledEdit) then
+    begin
+      if (TLabeledEdit(Components[i]).Tag = 1)
+      then
+      Begin
+        TLabeledEdit(Components[i]).Enabled:= False;
+        Break;
+      End;
+    end;
+  end;
+end;
+
+function Tfrmcadpadrao.Excluir: Boolean;
+begin
+  Result:= True;
+end;
+
+
+
+function Tfrmcadpadrao.FormatValor(AValor: Double): Currency;
+begin
+  Result:= StrToCurr(FormatFloat('###.00', AValor));
+end;
+
+procedure Tfrmcadpadrao.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SairForm;
+end;
+
+procedure Tfrmcadpadrao.FormCreate(Sender: TObject);
+begin
+  ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                   btnGravar, btnExcluir, bdnNavegar,
+                   pgcPrincipal, True);
+
+  pgcPrincipal.Pages[1].TabVisible:= False;
+  ControleAbas(pgcPrincipal, 0);
+  StatusCadastro:= ecNenhum;
+
+end;
+
+procedure Tfrmcadpadrao.FormShow(Sender: TObject);
+begin
+  DesabilitarCampos;
+end;
+
+function Tfrmcadpadrao.getMascaraCPF(ACPF: String): String;
+begin
+  if Length(ACPF) <> 11 then
+    result := ACPF
+  else
+    Result := Copy(ACPF, 1,  3) + '.' +
+              Copy(ACPF, 4,  3) + '.' +
+              Copy(ACPF, 7,  3) + '-' +
+              Copy(ACPF, 10, 2);
+end;
+
+function Tfrmcadpadrao.getMascaraCNPJ(ACNPJ: String): String;
+begin
+  if Length(ACNPJ) <> 14 then
+    result := ACNPJ
+  else
+    Result := Copy(ACNPJ, 1,  2) + '.' +
+              Copy(ACNPJ, 3,  3) + '.' +
+              Copy(ACNPJ, 6,  3) + '/' +
+              Copy(ACNPJ, 9,  4) + '-' +
+              Copy(ACNPJ, 13, 2);
+end;
+
+function Tfrmcadpadrao.getSomenteNumeros(const ANumeros: String): String;
+var
+  vContString: integer;
+  vString: string;
+begin
+  vString:='';
+  for vContString:= 1 To Length(ANumeros) Do
+    begin
+      if (ANumeros[vContString] in ['0'..'9']) then
+        begin
+          vString:= vString + Copy(ANumeros, vContString, 1);
+        end;
+    end;
+
+  if vString<>'' then
+    result:=vString
+  else
+    result:= vString;
+
+end;
+
+function Tfrmcadpadrao.Gravar(StatusCadastro: TStatusCadastro): Boolean;
+begin
+  Result:= True;
+end;
+
+procedure Tfrmcadpadrao.grdListagemMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  _codigo := DsPadrao.DataSet.Fields[0].AsInteger;
+end;
+
+procedure Tfrmcadpadrao.LimparCampos;
+var
+  i: Integer;
+begin
+  for i := 0 to ComponentCount -1 do
+  begin
+    if (Components[i] is TLabeledEdit) then
+      TLabeledEdit(Components[i]).Text:= EmptyStr
+    else
+    if (Components[i] is TEdit) then
+      TEdit(Components[i]).Text:= EmptyStr
+    else
+    if (Components[i] is TMaskEdit) then
+      TMaskEdit(Components[i]).Text:= EmptyStr
+    else
+      if (Components[i] is TDateTimePicker) then
+        TDateTimePicker(Components[i]).Date:= Now
+   else
+     if (Components[i] is TRadioGroup) then
+       TRadioGroup(Components[i]).ItemIndex:= -1
+   else
+   if (Components[i] is TCurrencyEdit) then
+      TCurrencyEdit(Components[i]).Text:='0,00'
+   else
+   if (Components[i] is TDBLookupComboBox) then
+     TDBLookupComboBox(Components[i]).KeyValue:= null;
+  end;
+
+end;
+
+procedure Tfrmcadpadrao.Lista(ACodigo: Integer);
+begin
+  //Este Método tem a finalidade de listar informações, das tabelas do Banco de dados.
+end;
+
+procedure Tfrmcadpadrao.mskPesquisaChange(Sender: TObject);
+begin
+  if Trim(mskPesquisa.Text) <> EmptyStr
+  then
+    dsPadrao.DataSet.Locate(_IndiceAtual, mskPesquisa.Text, [loCaseInsensitive, loPartialKey])
+  else
+   Selects(0, '');
+end;
+
+procedure Tfrmcadpadrao.SairForm;
+begin
+  if (StatusCadastro=ecInserir)
+    or (StatusCadastro=ecAlterar)
+  then
+  begin
+    if MessageDlg('Tem certeza que deseja sair?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
+    then
+      Close
+    else
+      Abort;
+  end
+  else
+    Close;
+end;
+
+procedure Tfrmcadpadrao.Selects(ACodigo: Integer; AIndiceAtual: string);
+begin
+  //Selects do Sistema
+end;
+
+function Tfrmcadpadrao.ValidaDataNasc(ADataNasc: TDate): Boolean;
+var
+  vidade: Double;
+begin
+  vidade:= Now - ADataNasc;
+  if vidade >= 18
+  then
+    Result:= True
+  else
+    Result:= False;
+end;
+
+procedure Tfrmcadpadrao.btnAlterarClick(Sender: TObject);
+begin
+  ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                     btnGravar, btnExcluir, bdnNavegar,
+                     pgcPrincipal, False);
+
+   pgcPrincipal.Pages[1].TabVisible:= True;
+   StatusCadastro:= ecAlterar;
+end;
+
+procedure Tfrmcadpadrao.btnCancelarClick(Sender: TObject);
+begin
+  ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                     btnGravar, btnExcluir, bdnNavegar,
+                     pgcPrincipal, True);
+  ControleAbas(pgcPrincipal, 0);
+  StatusCadastro:= ecNenhum;
+  LimparCampos;
+end;
+
+procedure Tfrmcadpadrao.btnExcluirClick(Sender: TObject);
+begin
+    try
+      StatusCadastro:= ecExcluir;
+      if (Excluir) and (_Codigo > 0)
+      then
+      begin
+        ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                           btnGravar, btnExcluir, bdnNavegar,
+                           pgcPrincipal, True);
+        ControleAbas(pgcPrincipal, 0);
+        LimparCampos;
+      end;
+
+    finally
+      StatusCadastro:= ecNenhum;
+    end;
+
+end;
+
+procedure Tfrmcadpadrao.btnGravarClick(Sender: TObject);
+begin
+  if CamposObrigatorios then
+    Exit;
+  try
+    if Gravar(StatusCadastro) then
+    begin
+      ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                          btnGravar, btnExcluir, bdnNavegar,
+                          pgcPrincipal, True);
+      pgcPrincipal.Pages[1].TabVisible:= False;
+      ControleAbas(pgcPrincipal, 0);
+      StatusCadastro:= ecNenhum;
+      LimparCampos;
+    end;
+  finally
+
+  end;
+end;
+
+procedure Tfrmcadpadrao.btnNovoClick(Sender: TObject);
+begin
+  ControloleBotoes(btnNovo, btnAlterar, btnCancelar,
+                   btnGravar, btnExcluir, bdnNavegar,
+                   pgcPrincipal, False);
+
+ pgcPrincipal.Pages[1].TabVisible:= True;
+ ControleAbas(pgcPrincipal, 1);
+ StatusCadastro:= ecInserir;
+ LimparCampos;
+end;
+
+end.

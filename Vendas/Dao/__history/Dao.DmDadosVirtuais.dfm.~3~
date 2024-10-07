@@ -1,0 +1,39 @@
+object DataModule1: TDataModule1
+  Height = 138
+  Width = 268
+  object dsVendasItens: TDataSource
+    DataSet = cdsVendasItens
+    Left = 164
+    Top = 41
+  end
+  object cdsVendasItens: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 52
+    Top = 41
+    object cdsVendasItensCodigoprod: TIntegerField
+      FieldName = 'Codigoprod'
+    end
+    object cdsVendasItensNomeProduto: TStringField
+      FieldName = 'NomeProduto'
+      Size = 100
+    end
+    object cdsVendasItensPrecoUnitProd: TCurrencyField
+      FieldName = 'PrecoUnitProd'
+      DisplayFormat = 'R$ ##.###0,00'
+    end
+    object cdsVendasItensQuantidadeProd: TCurrencyField
+      FieldName = 'QuantidadeProd'
+      DisplayFormat = '0.000'
+    end
+    object cdsVendasItensValorTotalProduto: TCurrencyField
+      FieldName = 'ValorTotalProduto'
+      DisplayFormat = 'R$ ##.###0,00'
+    end
+    object cdsVendasItensValorTotalVenda: TAggregateField
+      FieldName = 'ValorTotalVenda'
+      DisplayName = ''
+      Expression = 'SUM(ValorTotalProduto)'
+    end
+  end
+end

@@ -1,0 +1,25 @@
+unit Dao.ConexaoFactory;
+
+interface
+
+uses
+  FireDAC.Comp.Client;
+
+type
+  TConexaoFactory = class abstract
+  public
+    function CreateConexao: TFDConnection; virtual; abstract;
+    function CreateQuery(Conexao: TFDConnection): TFDQuery;
+  end;
+
+implementation
+
+{ TConexaoFactory }
+
+function TConexaoFactory.CreateQuery(Conexao: TFDConnection): TFDQuery;
+begin
+  Result := TFDQuery.Create(nil);
+  Result.Connection := Conexao;
+end;
+
+end.

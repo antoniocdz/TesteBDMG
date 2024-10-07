@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/04/03 17:57:14.000.169,=rtl.dcp</Transaction>
+    <Transaction>2017/04/03 17:57:38.000.485,D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\CurrencyEdit.dproj=C:\Users\XyberX\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
+    <Transaction>2017/04/03 17:57:42.000.893,=D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEdit.pas</Transaction>
+    <Transaction>2017/04/03 17:57:52.000.428,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 19:33:46.000.008,=fmx.dcp</Transaction>
+    <Transaction>2017/04/03 20:01:29.000.656,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:02:56.000.337,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:03:57.000.369,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:04:12.000.235,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:06:55.000.041,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:07:11.000.748,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:11:17.000.606,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:13:04.000.921,=vcl.dcp</Transaction>
+    <Transaction>2017/04/03 20:13:18.000.823,=vcl.dcp</Transaction>
+    <Transaction>2017/04/04 08:38:52.000.248,D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\CurrencyEditVCL.dproj=D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\CurrencyEdit.dproj</Transaction>
+    <Transaction>2017/04/04 08:52:25.000.391,D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEdit.pas=D:\Meus Dados\Projetos\MGR\Componentes\TCurrencyEdit\uCurrencyEditVCL.pas</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5" Android="42036320cc0a6200"/>
+	</ActiveMobileDevice>
+</BorlandProject>

@@ -1,0 +1,40 @@
+unit Dao.ConexaoFactory.Interfaces;
+
+interface
+
+
+uses
+  FireDAC.Comp.Client;
+
+type
+  IConexaoFactory = interface
+  ['{2AB63C73-3E83-4402-BFCC-4F76C9627CAF}']
+  function GetConexao(const AConection: Boolean): TFDConnection;
+  end;
+
+  TConexaoFactory = class (TInterfacedObject, IConexaoFactory)
+  public
+    function GetConexao(const AConection: Boolean): TFDConnection;
+  end;
+
+implementation
+uses
+  System.SysUtils;
+
+function TConexaoFactory.GetConexao(const AConection: Boolean): TFDConnection;
+begin
+  try
+  Result := TFDConnection.Create(nil);
+  Result.DriverName := 'MSSQL';
+  Result.Params.Add('Server=FULLSTACK\SQLEXPRESS');
+  Result.Params.Add('Database=vendas');
+  Result.Params.Add('User_Name=sa');
+  Result.Params.Add('Password=DevOps@19082703');
+  Result.Connected := AConection;
+  except
+    on E: Exception do
+      raise Exception.CreateFmt('Erro: %s', [E.Message]);
+  end;
+end;
+
+end.

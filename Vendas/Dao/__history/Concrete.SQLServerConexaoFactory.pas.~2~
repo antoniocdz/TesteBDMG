@@ -1,0 +1,31 @@
+unit Concrete.SQLServerConexaoFactory;
+
+interface
+
+uses
+  Dao.ConexaoFactory, FireDAC.Comp.Client;
+
+type
+  TSQLServerConexaoFactory = class(TConexaoFactory)
+  public
+    function CreateConexao: TFDConnection; override;
+  end;
+
+implementation
+
+{ TSQLServerConexaoFactory }
+
+function TSQLServerConexaoFactory.CreateConexao: TFDConnection;
+begin
+  Result := TFDConnection.Create(nil);
+  Result.DriverName := 'MSSQL';
+  Result.Params.Clear;
+  Result.Params.Add('Server=meu_servidor');
+  Result.Params.Add('Database=meu_banco_de_dados');
+  Result.Params.Add('User_Name=meu_usuario');
+  Result.Params.Add('Password=minha_senha');
+  Result.Params.Add('Pooled=True');
+  Result.Connected := True;
+end;
+
+end.

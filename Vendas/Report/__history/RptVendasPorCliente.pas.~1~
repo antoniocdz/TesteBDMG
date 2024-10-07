@@ -1,0 +1,24 @@
+unit RptVendasPorCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RRelatorioGroup, RLReport;
+
+type
+  TfrmRelatorioGroup1 = class(TfrmRelatorioGroup)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmRelatorioGroup1: TfrmRelatorioGroup1;
+
+implementation
+
+{$R *.dfm}
+
+end.

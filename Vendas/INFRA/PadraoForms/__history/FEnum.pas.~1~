@@ -1,0 +1,10 @@
+unit FEnum;
+
+interface
+
+type
+  TEstadodoCadastro = (ecIncluir, ecAlterar, ecNunhum);
+
+implementation
+
+end.

@@ -1,0 +1,18 @@
+inherited frmRelatorioGroup1: TfrmRelatorioGroup1
+  Caption = 'frmRelatorioGroup1'
+  TextHeight = 15
+  inherited RLRelatorioGroup: TRLReport
+    inherited RLBand1: TRLBand
+      inherited RLLHeader: TRLLabel
+        Left = 96
+        Width = 778
+        Caption = 'Vendas por Clientes'
+        ExplicitLeft = 96
+        ExplicitWidth = 778
+      end
+    end
+    inherited RLGroup: TRLGroup
+      DataFields = 'CodigoCli'
+    end
+  end
+end

@@ -1,0 +1,255 @@
+inherited frmRelatorioGVendasporCliente: TfrmRelatorioGVendasporCliente
+  Caption = 'frmRelGroupVendasporCliente'
+  TextHeight = 15
+  inherited RLRelatorioGroup: TRLReport
+    BeforePrint = RLRelatorioGroupBeforePrint
+    inherited RLBand1: TRLBand
+      inherited RLLHeader: TRLLabel
+        Left = 96
+        Width = 778
+        Caption = 'Vendas por Clientes'
+        ExplicitLeft = 96
+        ExplicitWidth = 778
+      end
+    end
+    inherited RLGroup: TRLGroup
+      Height = 86
+      DataFields = 'CodigoCli'
+      ExplicitHeight = 86
+      object RLBand2: TRLBand
+        Left = 0
+        Top = 0
+        Width = 1047
+        Height = 33
+        BandType = btHeader
+        object RLLabel5: TRLLabel
+          Left = 944
+          Top = 8
+          Width = 42
+          Height = 16
+          Caption = 'Status'
+        end
+        object RLLabel6: TRLLabel
+          Left = 848
+          Top = 8
+          Width = 81
+          Height = 16
+          Caption = 'Total Produto'
+        end
+        object RLLabel8: TRLLabel
+          Left = 761
+          Top = 8
+          Width = 70
+          Height = 16
+          Caption = 'Quantidade'
+        end
+        object RLLabel7: TRLLabel
+          Left = 663
+          Top = 8
+          Width = 61
+          Height = 16
+          Caption = 'Pre'#231'oUnit'
+        end
+        object RLLabel4: TRLLabel
+          Left = 390
+          Top = 8
+          Width = 50
+          Height = 16
+          Caption = 'Produto'
+        end
+        object RLLabel3: TRLLabel
+          Left = 221
+          Top = 8
+          Width = 44
+          Height = 16
+          Caption = 'Cliente'
+        end
+        object RLLabel2: TRLLabel
+          Left = 94
+          Top = 8
+          Width = 72
+          Height = 16
+          Caption = 'Data Venda'
+        end
+        object RLLabel1: TRLLabel
+          Left = 3
+          Top = 8
+          Width = 76
+          Height = 16
+          Caption = 'Num. Venda'
+        end
+        object RLDraw2: TRLDraw
+          Left = 0
+          Top = 26
+          Width = 1044
+          Height = 7
+          DrawKind = dkLine
+        end
+      end
+      object RLBand3: TRLBand
+        Left = 0
+        Top = 33
+        Width = 1047
+        Height = 23
+        object RLDBTDataVenda: TRLDBText
+          Left = 94
+          Top = 6
+          Width = 62
+          Height = 15
+          DataField = 'Datavenda'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTNumVenda: TRLDBText
+          Left = 6
+          Top = 6
+          Width = 65
+          Height = 15
+          DataField = 'NumVenda'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTCliente: TRLDBText
+          Left = 221
+          Top = 4
+          Width = 42
+          Height = 15
+          DataField = 'Cliente'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTProduto: TRLDBText
+          Left = 390
+          Top = 6
+          Width = 46
+          Height = 15
+          DataField = 'Produto'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTPrecoUnit: TRLDBText
+          Left = 663
+          Top = 4
+          Width = 57
+          Height = 15
+          DataField = 'PrecoUnit'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTQuantidade: TRLDBText
+          Left = 761
+          Top = 4
+          Width = 67
+          Height = 15
+          DataField = 'Quantidade'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object TotalProd: TRLDBText
+          Left = 851
+          Top = 5
+          Width = 73
+          Height = 15
+          DataField = 'TotalProduto'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+        object RLDBTStatus: TRLDBText
+          Left = 944
+          Top = 5
+          Width = 80
+          Height = 15
+          DataField = 'StatusVendas'
+          DataSource = dsrpt
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          Text = ''
+        end
+      end
+      object RLBand4: TRLBand
+        Left = 0
+        Top = 56
+        Width = 1047
+        Height = 28
+        BandType = btSummary
+        object RLDraw4: TRLDraw
+          Left = 848
+          Top = -1
+          Width = 199
+          Height = 7
+          DrawKind = dkLine
+        end
+        object RLLabel9: TRLLabel
+          Left = 760
+          Top = 8
+          Width = 77
+          Height = 16
+          Caption = 'Total Venda:'
+        end
+        object RLDBRTotalVenda: TRLDBResult
+          Left = 854
+          Top = 8
+          Width = 116
+          Height = 16
+          DataField = 'TotalProduto'
+          DataSource = dsrpt
+          Info = riSum
+          Text = ''
+        end
+      end
+    end
+    inherited RLFooeter: TRLBand
+      Top = 177
+      ExplicitTop = 177
+      inherited RLDraw3: TRLDraw
+        Width = 1043
+      end
+    end
+  end
+end

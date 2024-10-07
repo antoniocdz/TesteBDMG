@@ -1,0 +1,232 @@
+unit Vendas.View.CadClientes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FCadastro, Data.DB, Vcl.Grids,
+  Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls, Vcl.DBCtrls, Vcl.Buttons,
+  Vcl.ExtCtrls,
+
+  FactoryMethod.Controller.Interfaces, FEnum,
+  Datasnap.DBClient, Vcl.ButtonGroup,
+  Vcl.WinXPickers;
+
+type
+  TfrmcadClientes = class(Tfrmcadpadrao)
+    edtCodigo: TLabeledEdit;
+    edtnomecli: TLabeledEdit;
+    edtCPF: TLabeledEdit;
+    rgStatus: TRadioGroup;
+    Label2: TLabel;
+    dtpDatanasc: TDateTimePicker;
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+  private
+    FControllerCliente    : iControllerCliente;
+
+    procedure Listagem(ACodigo: Integer; AIndiceAtual: string);
+    function Gravar(StatusCadastro:TStatusCadastro): Boolean; override;
+    function Excluir:Boolean; override;
+    procedure Selects(ACodigo: Integer; AIndiceAtual: string); override;
+
+  public
+    { Public declarations }
+  end;
+
+var
+  frmcadClientes: TfrmcadClientes;
+
+implementation
+
+uses
+  System.StrUtils;
+
+{$R *.dfm}
+
+{ TfrmcadClientes }
+procedure TfrmcadClientes.Listagem(ACodigo: Integer; AIndiceAtual: string);
+begin
+  inherited;
+  FControllerCliente := TControllerCliente.New;
+  if ACodigo < 999999999
+   then
+   begin
+    FControllerCliente
+    .EntidadesCliente
+      .Cliente
+        .DataSet(DsPadrao)
+      .Open(ACodigo,'');
+   end
+   else
+   begin
+      FControllerCliente
+      .EntidadesCliente
+        .Cliente
+          .DataSet(DsPadrao)
+        .Open(ACodigo,Trim(mskPesquisa.Text));
+   end;
+
+end;
+
+procedure TfrmcadClientes.Selects(ACodigo: Integer; AIndiceAtual: string);
+begin
+  inherited;
+  if Trim(mskPesquisa.Text) = EmptyStr
+   then
+     Listagem(0,AIndiceAtual);
+
+end;
+
+procedure TfrmcadClientes.btnAlterarClick(Sender: TObject);
+begin
+  if _Codigo > 0
+  then
+  begin
+    Listagem(_Codigo, '');
+    edtCodigo.Text:= IntToStr(_Codigo);
+    edtnomecli.Text:= DsPadrao.DataSet.Fields[1].AsString;
+    edtCPF.Text:= getMascaraCPF(DsPadrao.DataSet.Fields[2].AsString);
+    if DsPadrao.DataSet.Fields[3].AsString = 'Ativo'
+     then
+      rgStatus.ItemIndex := 0
+    else
+      rgStatus.ItemIndex := 1;
+      if DsPadrao.DataSet.Fields[4].AsDateTime > 0 then
+        dtpDatanasc.Date:= StrToDate(FormatDateTime('dd/mm/yyyy',DsPadrao.DataSet.Fields[4].AsDateTime));
+
+    inherited;
+    edtnomecli.SetFocus;
+  end
+  else
+  begin
+    MessageDlg('Não há registros salvos.', mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+end;
+
+procedure TfrmcadClientes.btnCancelarClick(Sender: TObject);
+begin
+  Listagem(0,'');
+  inherited;
+end;
+
+procedure TfrmcadClientes.btnExcluirClick(Sender: TObject);
+begin
+  if _Codigo = 0 then
+  begin
+    MessageDlg('Não há registros salvos.', mtInformation, [mbOK], 0);
+    Exit;
+  end
+  else
+    inherited;
+end;
+
+procedure TfrmcadClientes.btnNovoClick(Sender: TObject);
+begin
+  inherited;
+  edtnomecli.SetFocus;
+end;
+
+procedure TfrmcadClientes.btnPesquisarClick(Sender: TObject);
+begin
+  inherited;
+  Listagem(999999999,_IndiceAtual);
+end;
+
+function TfrmcadClientes.Excluir: Boolean;
+begin
+  try
+    if (StatusCadastro=ecExcluir)
+     then
+     begin
+       if MessageDlg('Tem certeza que deseja excluir?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
+       then
+       begin
+         FControllerCliente := TControllerCliente.New;
+         Result:= FControllerCliente
+          .EntidadesCliente
+           .Cliente
+            .DataSet(DsPadrao)
+             .ExecSql(_Codigo,'', '','',0,'ecExcluir');
+          MessageDlg('Registro excluído com sucesso!', mtInformation, [mbOK], 0);
+       end
+       else
+         Result:= False;
+     end;
+     Listagem(0,'');
+  except
+     On E : Exception Do
+     begin
+       MessageDlg('Erro: ' + E.Message, mtError, [mbOK], 0);
+       Exit;
+     end;
+  end;
+
+end;
+
+procedure TfrmcadClientes.FormCreate(Sender: TObject);
+begin
+  inherited;
+  _FormFlagComponent:= 'N';
+  _FormFlagPreVendas:= 0;
+  Listagem(0,'');
+  if not grdListagem.DataSource.DataSet.IsEmpty
+   then
+   begin
+     grdListagem.DataSource.DataSet.First;
+     grdListagem.SelectedRows.CurrentRowSelected := True;
+     _codigo := DsPadrao.DataSet.Fields[0].AsInteger;
+   end
+   else
+   _codigo:= 0;
+
+end;
+
+procedure TfrmcadClientes.FormShow(Sender: TObject);
+begin
+  inherited;
+  _IndiceAtual:= 'Nome';
+end;
+
+function TfrmcadClientes.Gravar(StatusCadastro: TStatusCadastro): Boolean;
+begin
+  try
+    FControllerCliente := TControllerCliente.New;
+    if (StatusCadastro=ecInserir)
+     then
+     begin
+       Result:= FControllerCliente
+         .EntidadesCliente
+          .Cliente
+            .DataSet(DsPadrao)
+             .ExecSql(0,Trim(edtnomecli.Text), getSomenteNumeros(edtCPF.Text), rgStatus.Items[rgStatus.ItemIndex],dtpDatanasc.Date,'ecInserir');
+       if Result then MessageDlg('Registro salvo com sucesso!', mtInformation, [mbOK], 0);
+     end
+   else
+   begin
+     Result:= FControllerCliente
+      .EntidadesCliente
+       .Cliente
+        .DataSet(DsPadrao)
+         .ExecSql(StrToInt(trim(edtCodigo.Text)),Trim(edtnomecli.Text), getSomenteNumeros(edtCPF.Text),rgStatus.Items[rgStatus.ItemIndex],dtpDatanasc.Date,'ecAlterar');
+     if Result then MessageDlg('Registro atualizado com sucesso!', mtInformation, [mbOK], 0);
+   end;
+   Listagem(0,'');
+  except
+     On E : Exception Do
+     begin
+       MessageDlg('Erro: ' + E.Message, mtError, [mbOK], 0);
+       Exit;
+     end;
+  end;
+
+end;
+
+end.

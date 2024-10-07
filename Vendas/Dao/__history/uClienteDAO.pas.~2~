@@ -1,0 +1,68 @@
+unit uClienteDAO;
+
+interface
+
+ uses
+    uCliente, System.Generics.Collections, FireDAC.Comp.Client;
+
+  type
+    IClienteDAO = interface
+      ['{8F019D62-8683-45C3-9A8C-ED50DABDBCD6}']
+      function Insert(const Cliente: TCliente): Boolean;
+      function Update(const Cliente: TCliente): Boolean;
+      function Delete(const Cliente: TCliente): Boolean;
+      function Select(const Codigocli: Integer): TCliente;
+      function SelectAll: TObjectList<TCliente>;
+    end;
+
+    TClienteDAO = class(TInterfacedObject, IClienteDAO)
+    private
+      FConnection: TFDConnection;
+    public
+      constructor Create(Connection: TFDConnection);
+      function Insert(const Cliente: TCliente): Boolean;
+      function Update(const Cliente: TCliente): Boolean;
+      function Delete(const Cliente: TCliente): Boolean;
+      function Select(const Codigocli: Integer): TCliente;
+      function SelectAll: TObjectList<TCliente>;
+    end;
+
+  implementation
+
+  { TClienteDAO }
+
+  constructor TClienteDAO.Create(Connection: TFDConnection);
+  begin
+    FConnection := Connection;
+  end;
+
+  function TClienteDAO.Delete(const Cliente: TCliente): Boolean;
+  var
+    Query: TFDQuery;
+  begin
+    Query := TFDQuery.Create(nil);
+    try
+      Query.Connection := FConnection;
+      Query.SQL.Text := 'DELETE FROM clientes WHERE codigocli = :codigocli';
+      Query.ParamByName('codigocli').AsInteger := Cliente.codigocli;
+      Query.ExecSQL;
+      Result := Query.RowsAffected > 0;
+    finally
+      Query.Free;
+    end;
+  end;
+
+  function TClienteDAO.Insert(const Cliente: TCliente): Boolean;
+  var
+    Query: TFDQuery;
+  begin
+    Query := TFDQuery.Create(nil);
+    try
+      Query.Connection := FConnection;
+      Query.SQL.Text := 'INSERT INTO clientes (nomecli, cpfcli, statuscli) VALUES (:nomecli, :cpfcli, :statuscli)';
+      Query.ExecSQL;
+      Result := Query;
+    finally
+      Query.Free;
+    end;
+end.

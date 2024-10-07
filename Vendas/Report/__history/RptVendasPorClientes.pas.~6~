@@ -1,0 +1,41 @@
+unit RptVendasPorClientes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RRelatorio, Data.DB, Datasnap.DBClient,
+  RLReport;
+
+type
+  TRptVendasporCli = class(TRptRelatorio)
+    RLLabel5: TRLLabel;
+    RLLabel6: TRLLabel;
+    RLLabel4: TRLLabel;
+    RLLabel3: TRLLabel;
+    RLLabel2: TRLLabel;
+    RLLabel1: TRLLabel;
+    RLLabel7: TRLLabel;
+    RLLabel8: TRLLabel;
+    RLDBText1: TRLDBText;
+    RLDBText2: TRLDBText;
+    RLDBText3: TRLDBText;
+    RLDBText4: TRLDBText;
+    RLDBText5: TRLDBText;
+    RLDBText6: TRLDBText;
+    RLDBText7: TRLDBText;
+    RLDBText8: TRLDBText;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  RptVendasporCli: TRptVendasporCli;
+
+implementation
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,59 @@
+unit RptVendasPorClientes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, RRelatorio, Data.DB, Datasnap.DBClient,
+  RLReport,
+  FactoryMethod.Controller.Interfaces;
+
+type
+  TRptVendasporCli = class(TRptRelatorio)
+    RLLabel5: TRLLabel;
+    RLLabel6: TRLLabel;
+    RLLabel4: TRLLabel;
+    RLLabel3: TRLLabel;
+    RLLabel2: TRLLabel;
+    RLLabel1: TRLLabel;
+    RLLabel7: TRLLabel;
+    RLLabel8: TRLLabel;
+    RLDBTNumVenda: TRLDBText;
+    RLDBTDataVenda: TRLDBText;
+    RLDBTCliente: TRLDBText;
+    RLDBTProduto: TRLDBText;
+    RLDBTPrecoUnit: TRLDBText;
+    RLDBTQuantidade: TRLDBText;
+    TotalProd: TRLDBText;
+    RLDBTStatus: TRLDBText;
+    RLGroupCodigoCli: TRLGroup;
+    RLDraw4: TRLDraw;
+    RLLabel9: TRLLabel;
+    RLDBRTotalVenda: TRLDBResult;
+    procedure RelatoioBeforePrint(Sender: TObject; var PrintIt: Boolean);
+  private
+    FControllerPreVenda   : iControllerPreVenda;
+  public
+    { Public declarations }
+  end;
+
+var
+  RptVendasporCli: TRptVendasporCli;
+
+implementation
+
+{$R *.dfm}
+
+procedure TRptVendasporCli.RelatoioBeforePrint(Sender: TObject;
+  var PrintIt: Boolean);
+begin
+  inherited;
+  FControllerPreVenda := TControllerPreVenda.New;
+    FControllerPreVenda
+    .EntidadesPreVenda
+      .PreVenda
+        .DataSet(dsrpt)
+      .RptSelects(1);
+end;
+
+end.

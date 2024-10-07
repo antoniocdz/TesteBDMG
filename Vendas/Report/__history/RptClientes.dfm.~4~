@@ -1,0 +1,26 @@
+inherited RptRelClientes: TRptRelClientes
+  Caption = 'RptRelClientes'
+  TextHeight = 15
+  inherited Relatoio: TRLReport
+    inherited Cabecalho: TRLBand
+      inherited RLLHeader: TRLLabel
+        Left = 235
+        Width = 214
+        Caption = 'Relat'#243'rio de Clientes'
+        ExplicitLeft = 235
+        ExplicitWidth = 214
+      end
+    end
+    inherited Detalhe: TRLBand
+      object RLDBTCodigo: TRLDBText
+        Left = 20
+        Top = 8
+        Width = 42
+        Height = 16
+        DataField = 'codigo'
+        DataSource = dsrpt
+        Text = ''
+      end
+    end
+  end
+end
